@@ -1,0 +1,38 @@
+Известно, что класс String — immutable, класс объявлен final, значение строки хранится в массиве char, который отмечен ключевым словом final.
+
+
+public final class String
+    implements java.io.Serializable, Comparable<String>, CharSequence {
+    /** The value is used for character storage. */
+    private final char value[];
+
+
+    Да, можно. Ключевой момент – это понимание использования ключевого слова final с объектами.
+    Для подмены значения использует ReflectionAPI.
+
+    import java.lang.reflect.Field;
+
+    class B {
+        public static void main(String[] args) throws Exception {
+            String value = "Old value";
+            System.out.println(value);
+
+            //Получаем поле value в классе String
+            Field field = value.getClass().getDeclaredField("value");
+            //Разрешаем изменять его
+            field.setAccessible(true);
+            //Устанавливаем новое значение
+            field.set(value, "JavaRush".toCharArray());
+
+            System.out.println(value);
+
+            /* Вывод:
+             * Old value
+             * JavaRush
+             */
+        }
+    }
+
+    Обратите внимание, что если бы мы попытались изменить подобным образом финальную переменную примитивного типа,
+    то ничего бы не вышло. Предлагаю вам самостоятельно в этом убедить:
+    создать Java класс, например, с final int полем и попробовать изменить его значение через Reflection API.
